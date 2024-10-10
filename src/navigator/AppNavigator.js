@@ -2,13 +2,13 @@ import React from 'react';
 
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import { NavigationContainer } from '@react-navigation/native';
-import Splash from './src/screens/Splash';
-import Home from './src/screens/Home';
-import Search from './src/screens/Search';
-import Details from './src/screens/Details';
+import Splash from '../screens/Splash';
+import Home from '../screens/Home';
+import Search from '../screens/Search';
+import Details from '../screens/Details';
 
 
-const Stack = createNativeStackNavigator();
+const Stack =createNativeStackNavigator();
 
 const AppNavigator =()=>{
     return (
@@ -20,11 +20,7 @@ const AppNavigator =()=>{
         component={Splash}
         options={{headerShown:false}}
         />
-        <Stack.Screen
-        name="Home"
-        component={Home}
-        options={{headerShown:false}}
-        />
+        
         <Stack.Screen
         name="Search"
         component={Search}
