@@ -1,20 +1,22 @@
-import { View, Text, StyleSheet, Image, } from 'react-native'
-import React, { useEffect } from 'react'
+import { View, Text, StyleSheet, Image } from 'react-native';
+import React, { useEffect } from 'react';
 import * as Animatable from 'react-native-animatable';
 import { useNavigation } from '@react-navigation/native';
 
+
 const Splash = () => {
-  const navigation=useNavigation();
-  useEffect(()=>{
-    setTimeout(()=>{
-      navigation.navigate("Home")
-    },3000)
-  },[]);
+  const navigation:any = useNavigation();
+  useEffect(() => {
+    setTimeout(() => {
+      navigation.navigate('Home')
+    }, 3000);
+  }, []);
+
   return (
     <View style={styles.container}>
-      <Animatable.Image animation={'SlideInUp'} source={require('../images/logo.jpg')} style={styles.logo}/> 
-      <Animatable.Text animation={'SlideInUp'} style={styles.appName}>RecipePro</Animatable.Text>
-      <Animatable.Text animation={'SlideInUp'} style={styles.tagline}>Search AnyRecipeer with helth filters</Animatable.Text>
+      <Animatable.Image animation="slideInUp" source={require('../images/logo.png')} style={styles.logo}/> 
+      <Animatable.Text animation="slideInUp" style={styles.appName}>RecipePro</Animatable.Text>
+      <Animatable.Text animation="slideInUp" style={styles.tagline}>Search AnyRecipeer with health filters</Animatable.Text>
     </View>
   );
 };
@@ -39,12 +41,11 @@ const styles = StyleSheet.create({
     color: 'black',
     textAlign: 'center',
   },
-  tagline:{
-    position:'absolute',
-    bottom:50,
-    fontSize:20,
-    fontWeight:'600',
-    color:'black'
-
+  tagline: {
+    position: 'absolute',
+    bottom: 50,
+    fontSize: 20,
+    fontWeight: '600',
+    color: 'black'
   }
 });
