@@ -7,9 +7,13 @@ import {
   View,
   Image,
 } from 'react-native';
-import React, { useEffect, useState, memo } from 'react';
-import { MEAL_FILTERS } from '../Data';
+import React, {useEffect, useState} from 'react';
+import {MEAL_FILTERS} from '../Data';
+import {useNavigation} from '@react-navigation/native';
+import * as Animatable from 'react-native-animatable';
 
+
+const AnimatedBtn=Animatable.createAnimatableComponent(TouchableOpacity)
 interface Recipe {
   recipe: {
     label: string;
@@ -17,16 +21,9 @@ interface Recipe {
   };
 }
 
-const RecipeItem = memo(({ item }: { item: Recipe }) => {
-  return (
-    <TouchableOpacity style={styles.recipeItem}>
-      <Image source={{ uri: item.recipe.image }} style={styles.recipeImage} />
-    </TouchableOpacity>
-  );
-});
-
 const Home = () => {
   const [recipes, setRecipes] = useState<Recipe[]>([]);
+  const navigation: any = useNavigation();
 
   useEffect(() => {
     getTrendyRecipes();
@@ -43,59 +40,83 @@ const Home = () => {
       redirect: 'follow',
     };
 
-    fetch(`https://api.edamam.com/api/recipes/v2?type=public&q=food&app_id=55517a84&app_key=06ccbd6df34b3d255b5cb2c5cf427d7d`)
-      .then((response) => response.json())
-      .then((result) => {
+    fetch(
+      `https://api.edamam.com/api/recipes/v2?type=public&q=food&app_id=55517a84&app_key=06ccbd6df34b3d255b5cb2c5cf427d7d`,
+    )
+      .then(response => response.json())
+      .then(result => {
         console.log(result.hits);
         setRecipes(result.hits);
       })
-      .catch((error) => console.log('error', error));
+      .catch(error => console.log('error', error));
   };
 
   return (
     <View style={styles.container}>
       <StatusBar barStyle={'light-content'} />
       <View style={styles.topView}>
-        <Image source={require('../images/cooking.jpg')} style={styles.banner} />
+        <Animatable.Image animation={'slideInUp'}
+          source={require('../images/cooking.jpg')}
+          style={styles.banner}
+        />
         <View style={styles.transparentView}>
-          <Text style={styles.logo}>RecipePro</Text>
-          <TouchableOpacity activeOpacity={0.8} style={styles.searchBox}>
-            <Image source={require('../images/search.jpg')} style={styles.search} />
+          <Animatable.Text animation={'slideInUp'} style={styles.logo}>RecipePro</Animatable.Text>
+          <AnimatedBtn animation={'slideInUp'}activeOpacity={0.8} style={styles.searchBox}>
+            <Image
+              source={require('../images/search.jpg')}
+              style={styles.search}
+            />
             <Text style={styles.placeholder}>Please search here......</Text>
-          </TouchableOpacity>
-          <Text style={styles.note}>Search 1000+ recipes easily with one click</Text>
+          </AnimatedBtn>
+          <Animatable.Text animation={'slideInUp'} style={styles.note}>
+            Search 1000+ recipes easily with one click
+          </Animatable.Text>
         </View>
       </View>
 
-      <Text style={styles.heading}>Categories</Text>
+      <Animatable.Text animation={'slideInUp'} style={styles.heading}>Categories</Animatable.Text>
       <View>
         <FlatList
           horizontal
           data={MEAL_FILTERS}
-          
           showsHorizontalScrollIndicator={false}
-          renderItem={({ item }) => (
-            <TouchableOpacity style={styles.categoryItem}>
+          renderItem={({item}) => (
+            <AnimatedBtn animation={'slideInUp'} style={styles.categoryItem}>
               <View style={styles.card}>
                 <Image source={item.icon} style={styles.categoryIcon} />
               </View>
               <Text style={styles.category}>{item.title}</Text>
-            </TouchableOpacity>
+            </AnimatedBtn>
           )}
         />
       </View>
 
-      <Text style={styles.heading}>Trendy Recipes</Text>
+      <Animatable.Text animation={'slideInUp'} style={styles.heading}>Trendy Recipes</Animatable.Text>
       <View>
         <FlatList
-        contentContainerStyle={{marginTop:10}}
+          contentContainerStyle={{marginTop: 10}}
           horizontal
           data={recipes}
-          renderItem={({ item }) => <RecipeItem item={item} />}
+          renderItem={({item}) => (
+            <AnimatedBtn animation={'slideInUp'}
+              style={styles.recipeItem}
+              onPress={() => {
+                navigation.navigate('Details', {
+                  data: item,
+                });
+              }}>
+              <Animatable.Image animation={'slideInUp'}
+                source={{uri: item.recipe.image}}
+                style={styles.recipeImage}
+              />
+              <View style={styles.transparentView}>
+                <Text style={styles.recipeLabel}>{item.recipe.label}</Text>
+              </View>
+            </AnimatedBtn>
+          )}
           showsHorizontalScrollIndicator={false}
           keyExtractor={(item, index) => index.toString()}
-          initialNumToRender={5} // Adjust as needed
-          maxToRenderPerBatch={5} // Adjust as needed
+          
         />
       </View>
     </View>
@@ -178,7 +199,7 @@ const styles = StyleSheet.create({
   card: {
     width: '80%',
     height: '70%',
-    borderRadius: 8,
+    borderRadius: 9,
     shadowColor: 'rgba(0,0,0,.3)',
     shadowOpacity: 6,
     backgroundColor: '#fcfcfc',
@@ -202,12 +223,20 @@ const styles = StyleSheet.create({
     width: 180,
     height: 220,
     marginLeft: 20,
-    borderRadius: 15,
+    borderRadius: 9,
+    overflow: 'hidden',
   },
   recipeImage: {
     width: '100%',
     height: '100%',
-    borderRadius: 8,
+    borderRadius: 9,
     marginBottom: 10,
+  },
+  recipeLabel: {
+    marginTop: 90,
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: '#f8f6f6',
+    textAlign: 'center',
   },
 });
