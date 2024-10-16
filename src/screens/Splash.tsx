@@ -1,16 +1,16 @@
 import { View, Text, StyleSheet, Image } from 'react-native';
 import React, { useEffect } from 'react';
 import * as Animatable from 'react-native-animatable';
-import { useNavigation } from '@react-navigation/native';
 
 
-const Splash = () => {
-  const navigation:any = useNavigation();
+
+const Splash = ({ navigation }: any) => {
+  
   useEffect(() => {
     setTimeout(() => {
-      navigation.navigate('Home')
+      navigation.navigate('Drawer')
     }, 3000);
-  }, []);
+  }, [navigation]);
 
   return (
     <View style={styles.container}>
