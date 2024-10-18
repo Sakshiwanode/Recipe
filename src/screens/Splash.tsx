@@ -1,22 +1,61 @@
-import { View, Text, StyleSheet, Image } from 'react-native';
-import React, { useEffect } from 'react';
+import { View, Text, StyleSheet } from 'react-native';
+import React, { useEffect, useState } from 'react';
 import * as Animatable from 'react-native-animatable';
-
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Splash = ({ navigation }: any) => {
-  
+  const [isFirstLaunch, setIsFirstLaunch] = useState<boolean | null>(null);
+
   useEffect(() => {
-    setTimeout(() => {
-      navigation.navigate('Drawer')
-    }, 3000);
-  }, [navigation]);
+    const checkFirstLaunch = async () => {
+      try {
+        const launchedBefore = await AsyncStorage.getItem('launchedBefore');
+        if (launchedBefore === null) {
+          // First launch, show splash screen
+          setIsFirstLaunch(true);
+          await AsyncStorage.setItem('launchedBefore', 'true');
+        } else {
+          // Already launched, skip splash 
+          setIsFirstLaunch(false);
+        }
+      } catch (error) {
+        console.log('Error checking first launch:', error);
+      }
+    };
+
+    checkFirstLaunch();
+  }, []);
+
+  useEffect(() => {
+    if (isFirstLaunch === false) {
+      // Skip splash and navigate immediately if not first launch
+      navigation.navigate('Drawer');
+    } else if (isFirstLaunch === true) {
+      // Wait for 3 seconds before navigating to the main screen
+      setTimeout(() => {
+        navigation.navigate('Drawer');
+      }, 3000);
+    }
+  }, [isFirstLaunch, navigation]);
+
+  if (isFirstLaunch === null) {
+    // Optionally render a loading screen while checking
+    return null;
+  }
 
   return (
     <View style={styles.container}>
-      <Animatable.Image animation="slideInUp" source={require('../images/logo.png')} style={styles.logo}/> 
-      <Animatable.Text animation="slideInUp" style={styles.appName}>RecipePro</Animatable.Text>
-      <Animatable.Text animation="slideInUp" style={styles.tagline}>Search AnyRecipeer with health filters</Animatable.Text>
+      <Animatable.Image
+        animation="slideInUp"
+        source={require('../images/logo.png')}
+        style={styles.logo}
+      />
+      <Animatable.Text animation="slideInUp" style={styles.appName}>
+        RecipePro
+      </Animatable.Text>
+      <Animatable.Text animation="slideInUp" style={styles.tagline}>
+        Search Any Recipe with health filters
+      </Animatable.Text>
     </View>
   );
 };
@@ -27,13 +66,13 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#509750',
-    alignItems: 'center',    
-    justifyContent: 'center' 
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   logo: {
     width: 200,
     height: 200,
-    marginBottom: 20,        
+    marginBottom: 20,
   },
   appName: {
     fontSize: 40,
@@ -46,6 +85,6 @@ const styles = StyleSheet.create({
     bottom: 50,
     fontSize: 20,
     fontWeight: '600',
-    color: 'black'
-  }
+    color: 'black',
+  },
 });

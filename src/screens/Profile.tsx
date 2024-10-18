@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, Image, ActivityIndicator } from 'react-native';
+import { StyleSheet, TextInput, Text, View, TouchableOpacity, Image, ActivityIndicator, Alert } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import * as Animatable from 'react-native-animatable';
 
@@ -31,22 +31,75 @@ const AnimatedBtn = Animatable.createAnimatableComponent(TouchableOpacity);
 const Profile = ({ navigation }: any) => {
   const [userData, setUserData] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [email, setEmail] = useState('');
+
+  // Fetch user data (GET request)
+  const fetchUserData = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch('https://randomuser.me/api/');
+      const data = await response.json();
+      const user = data.results[0];
+      setUserData(user);
+      setFirstName(user.name.first);
+      setLastName(user.name.last);
+      setEmail(user.email);
+    } catch (error) {
+      console.error('Error fetching user data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        const response = await fetch('https://randomuser.me/api/');
-        const data = await response.json();
-        setUserData(data.results[0]);
-      } catch (error) {
-        console.error('Error fetching user data:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchUserData();
   }, []);
+
+  // Add or Update user data (POST or PUT request)
+  const addOrUpdateUser = async (isUpdate = false) => {
+    const method = isUpdate ? 'PUT' : 'POST';
+    try {
+      const response = await fetch('https://randomuser.me/api/', {
+        method: method,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: { first: firstName, last: lastName },
+          email: email,
+        }),
+      });
+
+      if (response.ok) {
+        Alert.alert('Success', `User ${isUpdate ? 'updated' : 'added'} successfully`);
+        fetchUserData(); // Refresh data
+      } else {
+        Alert.alert('Error', `Failed to ${isUpdate ? 'update' : 'add'} user`);
+      }
+    } catch (error) {
+      console.error(`Error ${isUpdate ? 'updating' : 'adding'} user:`, error);
+    }
+  };
+
+  // Delete user data (DELETE request)
+  const deleteUser = async () => {
+    try {
+      const response = await fetch('https://randomuser.me/api/', {
+        method: 'DELETE',
+      });
+
+      if (response.ok) {
+        Alert.alert('Success', 'User deleted successfully');
+        setUserData(null);
+      } else {
+        Alert.alert('Error', 'Failed to delete user');
+      }
+    } catch (error) {
+      console.error('Error deleting user:', error);
+    }
+  };
 
   if (loading) {
     return (
@@ -62,16 +115,70 @@ const Profile = ({ navigation }: any) => {
         <Icon name="arrow-back" size={30} color="#ffffff" />
       </TouchableOpacity>
 
-      {userData && (
+      {userData ? (
         <View style={styles.profileContainer}>
           <Image source={{ uri: userData.picture.large }} style={styles.profileImage} />
           <Text style={styles.nameText}>
             {`${userData.name.title} ${userData.name.first} ${userData.name.last}`}
           </Text>
           <Text style={styles.emailText}>{userData.email}</Text>
-          <Text style={styles.phoneText}>{`Phone: ${userData.phone}`}</Text>
-          <Text style={styles.dobText}>{`DOB: ${new Date(userData.dob.date).toLocaleDateString()} (Age: ${userData.dob.age})`}</Text>
-          <Text style={styles.locationText}>{`Location: ${userData.location.city}, ${userData.location.state}, ${userData.location.country}`}</Text>
+
+          {/* Form inputs for updating user data */}
+          <TextInput
+            placeholder="First Name"
+            value={firstName}
+            onChangeText={setFirstName}
+            style={styles.input}
+          />
+          <TextInput
+            placeholder="Last Name"
+            value={lastName}
+            onChangeText={setLastName}
+            style={styles.input}
+          />
+          <TextInput
+            placeholder="Email"
+            value={email}
+            onChangeText={setEmail}
+            style={styles.input}
+          />
+
+          {/* Button to update user data */}
+          <TouchableOpacity style={styles.button} onPress={() => addOrUpdateUser(true)}>
+            <Text style={styles.buttonText}>Update User</Text>
+          </TouchableOpacity>
+
+          {/* Button to delete user */}
+          <TouchableOpacity style={[styles.button, styles.deleteButton]} onPress={deleteUser}>
+            <Text style={styles.buttonText}>Delete User</Text>
+          </TouchableOpacity>
+        </View>
+      ) : (
+        <View>
+          {/* Form inputs for adding new user */}
+          <TextInput
+            placeholder="First Name"
+            value={firstName}
+            onChangeText={setFirstName}
+            style={styles.input}
+          />
+          <TextInput
+            placeholder="Last Name"
+            value={lastName}
+            onChangeText={setLastName}
+            style={styles.input}
+          />
+          <TextInput
+            placeholder="Email"
+            value={email}
+            onChangeText={setEmail}
+            style={styles.input}
+          />
+
+          {/* Button to add new user */}
+          <TouchableOpacity style={styles.button} onPress={() => addOrUpdateUser()}>
+            <Text style={styles.buttonText}>Add User</Text>
+          </TouchableOpacity>
         </View>
       )}
     </View>
@@ -112,20 +219,30 @@ const styles = StyleSheet.create({
     color: '#ffffff',
     marginTop: 5,
   },
-  phoneText: {
-    fontSize: 16,
-    color: '#ffffff',
-    marginTop: 5,
+  input: {
+    borderWidth: 1,
+    borderColor: '#111111',
+    padding: 10,
+    marginBottom: 10,
+    borderRadius: 5,
+    width: '100%',
+    backgroundColor: '#0e0d0d',
   },
-  dobText: {
-    fontSize: 16,
-    color: '#ffffff',
-    marginTop: 5,
+  button: {
+    backgroundColor: '#3b5998',
+    padding: 15,
+    borderRadius: 5,
+    alignItems: 'center',
+    marginVertical: 5,
+    width: '100%',
   },
-  locationText: {
+  deleteButton: {
+    backgroundColor: 'red',
+  },
+  buttonText: {
+    color: '#fff',
     fontSize: 16,
-    color: '#ffffff',
-    marginTop: 5,
+    fontWeight: 'bold',
   },
   backButton: {
     position: 'absolute',

@@ -1,73 +1,89 @@
 import React from 'react';
 import { View, Image, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { createDrawerNavigator } from '@react-navigation/drawer';
-import {
-  DrawerContentScrollView,
-  DrawerItemList,
-} from '@react-navigation/drawer';
-
+import { createDrawerNavigator, DrawerContentScrollView, DrawerItemList } from '@react-navigation/drawer';
+import MainTabNavigator from './TabNavigator'; 
 import Profile from '../screens/Profile';
-import Home from '../screens/Home';
-import Search from '../screens/Search';
+import Ionicons from 'react-native-vector-icons/Ionicons'; 
 
 const Drawer = createDrawerNavigator();
+
+const CustomDrawerContent = (props) => {
+  return (
+    <DrawerContentScrollView {...props} contentContainerStyle={{ flex: 1, backgroundColor: '#57b95a' }}>
+      <View style={styles.drawerHeader}>
+        <TouchableOpacity onPress={() => props.navigation.closeDrawer()} style={styles.backArrow}>
+          <Ionicons name="arrow-back-outline" size={25} color="white" /> 
+        </TouchableOpacity>
+
+        <View style={styles.logoContainer}>
+          <Image
+            source={require('../images/logo.png')}
+            style={styles.logo}
+          />
+        </View>
+
+        <View style={styles.textContainer}>
+          <Text
+            style={styles.profileText}
+            onPress={() => props.navigation.navigate('Profile')}>
+            Profile
+          </Text>
+        </View>
+      </View>
+
+      <View style={styles.drawerItemsContainer}>
+        <DrawerItemList {...props} />
+      </View>
+
+      <View style={styles.logoutContainer}>
+        <TouchableOpacity
+          style={styles.logoutButton}
+          onPress={() => {
+            props.navigation.navigate('Login');
+          }}>
+          <Text style={styles.logoutText}>Log Out</Text>
+        </TouchableOpacity>
+      </View>
+    </DrawerContentScrollView>
+  );
+};
 
 const DrawerNavigator = () => {
   return (
     <View style={styles.container}>
       <Drawer.Navigator
-        drawerContent={(props) => (
-          <DrawerContentScrollView {...props} contentContainerStyle={{ flex: 1,backgroundColor:'#45af48' }}>
-            <View style={styles.drawerHeader}>
-              <Image source={require('../images/logo.png')} style={styles.logo} />
-              <Text
-                style={styles.profileText}
-                onPress={() => props.navigation.navigate('Profile')}>
-                Profile
-              </Text>
-            </View>
-
-           
-            <View style={styles.drawerItemsContainer}>
-              <DrawerItemList {...props} />
-            </View>
-
-          
-            <View style={styles.logoutContainer}>
-              <TouchableOpacity
-                style={styles.logoutButton}
-                onPress={() => {
-                  props.navigation.navigate('Login');
-                }}
-              >
-                <Text style={styles.logoutText}>LogOut</Text>
-              </TouchableOpacity>
-            </View>
-          </DrawerContentScrollView>
-        )}
+        drawerContent={(props) => <CustomDrawerContent {...props} />}
+        screenOptions={{
+          drawerActiveTintColor: '#ffffff', 
+        }}
       >
         <Drawer.Screen
           name="Home"
-          component={Home}
+          component={MainTabNavigator}
           options={{
-            headerShown: true,
-            headerTitle: '',
-            headerTransparent: true,
-            headerTintColor: 'white',
+            headerShown: false,
+            drawerIcon: ({ focused, color, size }) => (
+              <Ionicons
+                name="home-outline"
+                size={size}
+                color={focused ? '#ffffff' : color} 
+              />
+            ),
           }}
         />
         <Drawer.Screen
           name="Profile"
           component={Profile}
           options={{
-             headerShown: false,
-           
-            }}
-        />
-        <Drawer.Screen
-          name="Search"
-          component={Search}
-          options={{ headerShown: false }}
+            headerShown: false,
+            drawerIcon: ({ focused, color, size }) => (
+              <Ionicons
+                name="person-outline"
+                size={size}
+                color={focused ? '#57b95a' : color} 
+              />
+            ),
+          }}
         />
       </Drawer.Navigator>
     </View>
@@ -79,30 +95,39 @@ export default DrawerNavigator;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-   
   },
   drawerHeader: {
-    padding: 10,
+    
+    flexDirection: 'column',
     alignItems: 'center',
   },
+  backArrow: {
+    padding: 10,
+    alignSelf: 'flex-start',
+    marginBottom: -50
+   
+  },
   logo: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
+    alignSelf: 'center',
+    width: 170, 
+    height: 150,
+   
   },
   profileText: {
-    marginTop: 10,
     fontSize: 18,
     fontWeight: 'bold',
     color: 'black',
+   
+   
+  
   },
   drawerItemsContainer: {
-    flex: 1, 
+    flex: 1,
   },
   logoutContainer: {
-    borderTopWidth: 1,
+    borderTopWidth: 3,
     borderTopColor: '#ccc',
-    padding: 10,
+    padding: 11,
   },
   logoutButton: {
     alignItems: 'center',
@@ -112,4 +137,11 @@ const styles = StyleSheet.create({
     color: '#ff3333',
     fontWeight: 'bold',
   },
+  logoContainer:{
+    marginTop: 0
+   
+  },
+  textContainer:{
+ 
+  }
 });

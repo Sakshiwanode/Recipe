@@ -10,7 +10,22 @@ const LoginScreen = ({ navigation }: any) => {
   const [password, setPassword] = useState('password');
   const [showPassword, setShowPassword] = useState(false);
 
+  
   const handleLogin = () => {
+    if (!username && !password) {
+      Alert.alert('Error', 'Please fill out both username and password');
+      return;
+    }
+    if (!username) {
+      Alert.alert('Error', 'Please enter your username');
+      return;
+    }
+    
+    if (!password) {
+      Alert.alert('Error', 'Please enter your password');
+      return;
+    }
+    
     if (username === 'admin' && password === 'password') {
       Alert.alert('Success', 'Login successful!', [
         { text: 'OK', onPress: () => navigation.navigate('Splash') },
@@ -18,7 +33,9 @@ const LoginScreen = ({ navigation }: any) => {
     } else {
       Alert.alert('Error', 'Invalid username or password');
     }
+    
   };
+  
 
   return (
     <View style={styles.container}>
@@ -35,7 +52,6 @@ const LoginScreen = ({ navigation }: any) => {
           placeholderTextColor="#777"
           value={username}
           onChangeText={setUsername}
-          autoCapitalize="none"
         />
 
         <View style={styles.passwordContainer}>
@@ -59,7 +75,7 @@ const LoginScreen = ({ navigation }: any) => {
           </TouchableOpacity>
         </View>
 
-        <AnimatedBtn animation="fadeIn" duration={1500} style={styles.button} onPress={handleLogin}>
+        <AnimatedBtn animation="fadeIn" duration={1500} style={styles.button} onPress={()=>handleLogin()}>
           <Text style={styles.buttonText}>Login</Text>
         </AnimatedBtn>
 

@@ -6,14 +6,16 @@ import {
   TouchableOpacity,
   View,
   Image,
+  ActivityIndicator,
 } from 'react-native';
-import React, {useEffect, useState} from 'react';
-import {MEAL_FILTERS} from '../Data';
-import {useNavigation} from '@react-navigation/native';
+import React, { useEffect, useState } from 'react';
+import { MEAL_FILTERS } from '../Data';
+import { useNavigation } from '@react-navigation/native';
 import * as Animatable from 'react-native-animatable';
+import Icon from 'react-native-vector-icons/FontAwesome';
 
+const AnimatedBtn = Animatable.createAnimatableComponent(TouchableOpacity);
 
-const AnimatedBtn=Animatable.createAnimatableComponent(TouchableOpacity)
 interface Recipe {
   recipe: {
     label: string;
@@ -21,8 +23,9 @@ interface Recipe {
   };
 }
 
-const Home = () => {
+const HomeScreen = () => {
   const [recipes, setRecipes] = useState<Recipe[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const navigation: any = useNavigation();
 
   useEffect(() => {
@@ -41,94 +44,133 @@ const Home = () => {
     };
 
     fetch(
-      `https://api.edamam.com/api/recipes/v2?type=public&q=food&app_id=55517a84&app_key=06ccbd6df34b3d255b5cb2c5cf427d7d`,
+      `https://api.edamam.com/api/recipes/v2?type=public&q=food&app_id=55517a84&app_key=06ccbd6df34b3d255b5cb2c5cf427d7d`
     )
       .then(response => response.json())
       .then(result => {
-        console.log(result.hits);
         setRecipes(result.hits);
+        setIsLoading(false);
       })
-      .catch(error => console.log('error', error));
+      .catch(error => {
+        console.log('error', error);
+        setIsLoading(false);
+      });
   };
 
   return (
     <View style={styles.container}>
       <StatusBar barStyle={'light-content'} />
+      <TouchableOpacity
+        style={styles.togglerIcon}
+        onPress={() => navigation.toggleDrawer()}
+      >
+        <Icon name="bars" size={30} color="#ffffff" />
+      </TouchableOpacity>
       <View style={styles.topView}>
-        <Animatable.Image animation={'slideInUp'}
+        <Image
           source={require('../images/cooking.jpg')}
           style={styles.banner}
         />
         <View style={styles.transparentView}>
-          <Animatable.Text animation={'slideInUp'} style={styles.logo}>RecipePro</Animatable.Text>
-          <AnimatedBtn animation={'slideInUp'}activeOpacity={0.8} style={styles.searchBox}>
+          <Animatable.Text animation={'slideInUp'} style={styles.logo}>
+            RecipePro
+          </Animatable.Text>
+          <TouchableOpacity
+            activeOpacity={0.8}
+            style={styles.searchBox}
+            onPress={() => {
+              navigation.navigate('Search');
+            }}>
             <Image
               source={require('../images/search.jpg')}
               style={styles.search}
             />
-            <Text style={styles.placeholder}>Please search here......</Text>
-          </AnimatedBtn>
-          <Animatable.Text animation={'slideInUp'} style={styles.note}>
+            <Text style={styles.placeholder}>
+              Please search here......
+            </Text>
+          </TouchableOpacity>
+          <Text style={styles.note}>
             Search 1000+ recipes easily with one click
-          </Animatable.Text>
+          </Text>
         </View>
       </View>
 
-      <Animatable.Text animation={'slideInUp'} style={styles.heading}>Categories</Animatable.Text>
+      <Animatable.Text animation={'slideInUp'} style={styles.heading}>
+        Categories
+      </Animatable.Text>
       <View>
         <FlatList
           horizontal
           data={MEAL_FILTERS}
           showsHorizontalScrollIndicator={false}
-          renderItem={({item}) => (
-            <AnimatedBtn animation={'slideInUp'} style={styles.categoryItem}>
+          renderItem={({ item }) => (
+            <AnimatedBtn
+              animation={'slideInUp'}
+              style={styles.categoryItem}
+              onPress={() => {
+                navigation.navigate('RecipeByCategory', { category: item.title });
+              }}>
               <View style={styles.card}>
                 <Image source={item.icon} style={styles.categoryIcon} />
               </View>
               <Text style={styles.category}>{item.title}</Text>
             </AnimatedBtn>
           )}
+          keyExtractor={(item) => item.title} 
         />
       </View>
 
-      <Animatable.Text animation={'slideInUp'} style={styles.heading}>Trendy Recipes</Animatable.Text>
-      <View>
+      <Animatable.Text animation={'slideInUp'} style={styles.heading}>
+        Trendy Recipes
+      </Animatable.Text>
+
+      {isLoading ? (
+        <ActivityIndicator size="large" color="#509750" style={{ marginTop: 20 }} />
+      ) : (
         <FlatList
-          contentContainerStyle={{marginTop: 10}}
-          horizontal
-          data={recipes}
-          renderItem={({item}) => (
-            <AnimatedBtn animation={'slideInUp'}
-              style={styles.recipeItem}
-              onPress={() => {
-                navigation.navigate('Details', {
-                  data: item,
-                });
-              }}>
-              <Animatable.Image animation={'slideInUp'}
-                source={{uri: item.recipe.image}}
-                style={styles.recipeImage}
-              />
-              <View style={styles.transparentView}>
-                <Text style={styles.recipeLabel}>{item.recipe.label}</Text>
-              </View>
-            </AnimatedBtn>
-          )}
-          showsHorizontalScrollIndicator={false}
-          keyExtractor={(item, index) => index.toString()}
-          
-        />
+  contentContainerStyle={{ marginTop: 10 }}
+  horizontal
+  data={recipes}
+  renderItem={({ item }) => (
+    <AnimatedBtn
+      animation={'slideInUp'}
+      style={styles.recipeItem}
+      onPress={() => {
+        navigation.navigate('Details', {
+          data: item,
+        });
+      }}>
+      <Animatable.Image
+        animation={'slideInUp'}
+        source={{ uri: item.recipe.image }}
+        style={styles.recipeImage}
+      />
+      <View style={styles.transparentView}>
+        <Text style={styles.recipeLabel}>{item.recipe.label}</Text>
       </View>
+    </AnimatedBtn>
+  )}
+  keyExtractor={(item, index) => `${item.recipe.label}-${index}`} 
+/>
+
+      )}
     </View>
   );
 };
 
-export default Home;
+export default HomeScreen;
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#eaeff5',
+  },
+  togglerIcon: {
+    position: 'absolute',
+    top: 20,
+   
+    right:10,
+    zIndex: 1,
   },
   topView: {
     width: '100%',
@@ -154,7 +196,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     paddingLeft: 20,
     alignSelf: 'flex-start',
-    marginTop: 40,
+    marginTop: 10,
   },
   searchBox: {
     width: '90%',
