@@ -1,84 +1,79 @@
-import { useNavigation } from '@react-navigation/native';
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, TextInput, Image, FlatList, ActivityIndicator } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, TextInput, FlatList, ActivityIndicator, Dimensions, Image } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
+import Modal from 'react-native-modal';
+import { DISH_FILTERS, DIET_FILTERS, HEALTH_FILTERS, CUISINE_FILTERS } from '../Data';
 
-interface Recipe {
-  recipe: {
-    source: string;
-    label: string;
-    image: string;
-  };
-}
+const screenHeight = Dimensions.get('window').height;
 
 const Search = ({ navigation }: any) => {
-  const [search, setSearch] = useState<string>('');
-  const [recipes, setRecipes] = useState<Recipe[]>([]);
-  const [loading, setLoading] = useState<boolean>(false); // State to track loading
+  const [search, setSearch] = useState('');
+  const [recipes, setRecipes] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [showFilters, setShowFilters] = useState(false);
+  const [selectedFilters, setSelectedFilters] = useState<string[]>([]);
+  
+  const [selectDish, setSelectDish] = useState('');
+  const [selectCuisine, setSelectCuisine] = useState('');
+  const [selectHealth, setSelectHealth] = useState('');
+  const [selectDiet, setSelectDiet] = useState('');
 
-  const SearchRecipe = () => {
-    setLoading(true); // Start loading
-    var myHeaders = new Headers();
-    myHeaders.append('accept', 'application/json');
-    myHeaders.append('Accept-Language', 'en');
-
-    const requestOptions = {
-      method: 'GET',
-      headers: myHeaders,
-      redirect: 'follow',
-    };
-
-    fetch(
-      `https://api.edamam.com/api/recipes/v2?type=public&q=${search}&app_id=55517a84&app_key=06ccbd6df34b3d255b5cb2c5cf427d7d`,
-    )
-      .then(response => response.json())
-      .then(result => {
-        setRecipes(result.hits);
-      })
-      .catch(error => console.log('error', error))
-      .finally(() => {
-        setLoading(false); // Stop loading after fetch
-      });
+  const searchRecipe = async () => {
+    if (!search.trim()) return;
+    setLoading(true);
+    try {
+      const response = await fetch(
+        `https://api.edamam.com/api/recipes/v2?type=public&q=${search}&app_id=55517a84&app_key=06ccbd6df34b3d255b5cb2c5cf427d7d&dishType=${selectDish}&cuisineType=${selectCuisine}&health=${selectHealth}&diet=${selectDiet}`
+      );
+      const result = await response.json();
+      setRecipes(result.hits || []); 
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <View style={styles.container}>
       <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-        <Icon name="arrow-back" size={30} color="#fffefe" />
+        <Icon name="arrow-back" size={30} color="#fff" />
       </TouchableOpacity>
 
       <View style={styles.searchBox}>
-        <Image source={require('../images/search.jpg')} style={styles.search} />
+        <TouchableOpacity onPress={searchRecipe} style={styles.searchIcon}>
+          <Icon name="search" size={30} color="#509750" />
+        </TouchableOpacity>
         <TextInput
           value={search}
           onChangeText={setSearch}
           placeholder="Please search here..."
           style={styles.placeholder}
         />
-        {search !== '' && (
+        {search ? (
           <TouchableOpacity
             style={styles.clearButton}
             onPress={() => {
               setSearch('');
               setRecipes([]);
-            }}>
-            <Image source={require('../images/close.jpg')} style={styles.search} />
+            }}
+          >
+            <Icon name="close" size={30} color="#509750" />
           </TouchableOpacity>
-        )}
+        ) : null}
       </View>
 
-      <TouchableOpacity onPress={SearchRecipe} style={styles.searchButton}>
-        <Text style={styles.searchButtonText}>Search</Text>
-      </TouchableOpacity>
-
-      {loading ? ( // Show loading indicator while fetching
+      {loading ? (
         <ActivityIndicator size="large" color="#fff" style={styles.loadingIndicator} />
       ) : (
         <FlatList
           data={recipes}
           keyExtractor={(item, index) => index.toString()}
           renderItem={({ item }) => (
-            <TouchableOpacity style={styles.recipeItem} onPress={() => { navigation.navigate('Details', { data: item }); }}>
+            <TouchableOpacity
+              style={styles.recipeItem}
+              onPress={() => navigation.navigate('Details', { data: item })}
+            >
               <Image source={{ uri: item.recipe.image }} style={styles.itemImage} />
               <View style={styles.itemTextContainer}>
                 <Text style={styles.itemText}>{item.recipe.label}</Text>
@@ -89,9 +84,112 @@ const Search = ({ navigation }: any) => {
           contentContainerStyle={styles.flatListContent}
         />
       )}
+
+      <TouchableOpacity style={styles.fab} onPress={() => setShowFilters(true)}>
+        <Icon name="add" size={30} color="#fff" />
+      </TouchableOpacity>
+
+      {/* Filter Modal */}
+      <Modal
+        isVisible={showFilters}
+        onBackdropPress={() => setShowFilters(false)}
+        style={styles.modal}
+      >
+        <View style={styles.modalContent}>
+          <View style={styles.headerContainer}>
+            <Text style={{ fontSize: 30 }}>Filters</Text>
+            <TouchableOpacity style={styles.closeIcon} onPress={() => setShowFilters(false)}>
+              <Icon name="close" size={40} color="#000" />
+            </TouchableOpacity>
+          </View>
+
+          <View>
+            <Text>Dish Type</Text>
+            <FlatList
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={{ marginTop: 10 }}
+              horizontal
+              data={DISH_FILTERS}
+              renderItem={({ item }) => (
+                <TouchableOpacity
+                  style={[styles.filterItem, { backgroundColor: selectDish === item ? '#f3ecec' : 'transparent' }]}
+                  onPress={() => setSelectDish(item)}
+                >
+                  <Text style={[styles.filterItemText, { color: selectDish === item ? 'black' : 'white' }]}>{item}</Text>
+                </TouchableOpacity>
+              )}
+            />
+          </View>
+
+          <View>
+            <Text>Cuisine</Text>
+            <FlatList
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={{ marginTop: 10 }}
+              horizontal
+              data={CUISINE_FILTERS}
+              renderItem={({ item }) => (
+                <TouchableOpacity
+                  style={[styles.filterItem, { backgroundColor: selectCuisine === item ? '#f3ecec' : 'transparent' }]}
+                  onPress={() => setSelectCuisine(item)}
+                >
+                  <Text style={[styles.filterItemText, { color: selectCuisine === item ? 'black' : 'white' }]}>{item}</Text>
+                </TouchableOpacity>
+              )}
+            />
+          </View>
+
+          <View>
+            <Text>Health</Text>
+            <FlatList
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={{ marginTop: 10 }}
+              horizontal
+              data={HEALTH_FILTERS}
+              renderItem={({ item }) => (
+                <TouchableOpacity
+                  style={[styles.filterItem, { backgroundColor: selectHealth === item ? '#f3ecec' : 'transparent' }]}
+                  onPress={() => setSelectHealth(item)}
+                >
+                  <Text style={[styles.filterItemText, { color: selectHealth === item ? 'black' : 'white' }]}>{item}</Text>
+                </TouchableOpacity>
+              )}
+            />
+          </View>
+
+          <View>
+            <Text>Diet</Text>
+            <FlatList
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={{ marginTop: 10 }}
+              horizontal
+              data={DIET_FILTERS}
+              renderItem={({ item }) => (
+                <TouchableOpacity
+                  style={[styles.filterItem, { backgroundColor: selectDiet === item ? '#f3ecec' : 'transparent' }]}
+                  onPress={() => setSelectDiet(item)}
+                >
+                  <Text style={[styles.filterItemText, { color: selectDiet === item ? 'black' : 'white' }]}>{item}</Text>
+                </TouchableOpacity>
+              )}
+            />
+          </View>
+
+          <TouchableOpacity
+            style={styles.applyButton}
+            onPress={() => {
+              setShowFilters(false);
+              searchRecipe();
+            }}
+          >
+            <Text style={styles.applyButtonText}>Apply Filters</Text>
+          </TouchableOpacity>
+        </View>
+      </Modal>
     </View>
   );
 };
+
 
 export default Search;
 
@@ -106,12 +204,8 @@ const styles = StyleSheet.create({
     top: 10,
     left: 10,
   },
-  search: {
-    width: 30,
-    height: 40,
-  },
   placeholder: {
-    marginLeft: 15,
+    marginLeft: 10,
     fontSize: 16,
     color: '#9b9090',
     flex: 1,
@@ -129,16 +223,8 @@ const styles = StyleSheet.create({
   clearButton: {
     padding: 10,
   },
-  searchButton: {
-    marginTop: 20, // Adjusted margin for better spacing
-    backgroundColor: '#fff',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 8,
-  },
-  searchButtonText: {
-    fontSize: 16,
-    color: '#509750',
+  searchIcon: {
+    padding: 10,
   },
   loadingIndicator: {
     marginTop: 20,
@@ -177,4 +263,90 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#7a7a7a',
   },
+  fab: {
+    position: 'absolute',
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: '#509750',
+    alignItems: 'center',
+    justifyContent: 'center',
+    right: 20,
+    bottom: 30,
+    elevation: 8,
+  },
+  selectedFiltersContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    padding: 10,
+    width: '90%',
+  },
+  selectedFilter: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#ffffff',
+    borderRadius: 15,
+    padding: 5,
+    margin: 5,
+  },
+  selectedFilterText: {
+    marginRight: 5,
+    color: 'black',
+  },
+  modalContent: {
+    backgroundColor: '#509750',
+    padding: 20,
+    borderRadius: 10,
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    color: '#f7efef',
+    marginTop: 10,
+  },
+  horizontalList: {
+    paddingHorizontal: 5,
+  },
+  filterItem: {
+    backgroundColor: '#dde0de',
+    borderRadius: 9,
+    borderWidth:1,
+    padding: 10,
+    marginHorizontal: 5,
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom:10
+  },
+  filterItemText: {
+    marginRight: 5,
+    color: '#000',
+  },
+  selected: {
+    backgroundColor: '#5cc27a',
+  },
+  closeIcon: {
+    alignSelf: 'flex-end',
+  },
+  modal: {
+    justifyContent: 'flex-end',
+    margin: 0,
+  },
+  applyButton: {
+    marginTop: 10,
+    backgroundColor: '#4caf50',
+    paddingVertical: 15,
+    borderRadius: 8,
+  },
+  applyButtonText: {
+    textAlign: 'center',
+    color: '#fff',
+    fontSize: 18,
+  },
+  headerContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    width: '100%', 
+    marginBottom: 10,}
 });

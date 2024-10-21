@@ -2,8 +2,7 @@ import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Home from '../screens/Home';
 import Profile from '../screens/Profile';
-import Search from '../screens/Search'; // Import Search screen
-import RecipeByCategories from '../screens/RecipeByCategories'; // Import RecipeByCategories screen
+import Search from '../screens/Search'; 
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 const Tab = createBottomTabNavigator();
