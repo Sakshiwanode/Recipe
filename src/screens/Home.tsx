@@ -14,6 +14,7 @@ import { useNavigation } from '@react-navigation/native';
 import * as Animatable from 'react-native-animatable';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
+
 const AnimatedBtn = Animatable.createAnimatableComponent(TouchableOpacity);
 
 interface Recipe {
@@ -62,8 +63,7 @@ const HomeScreen = () => {
       <StatusBar barStyle={'light-content'} />
       <TouchableOpacity
         style={styles.togglerIcon}
-        onPress={() => navigation.toggleDrawer()}
-      >
+        onPress={() => navigation.toggleDrawer()}>
         <Icon name="bars" size={30} color="#ffffff" />
       </TouchableOpacity>
       <View style={styles.topView}>
@@ -81,14 +81,11 @@ const HomeScreen = () => {
             onPress={() => {
               navigation.navigate('Search');
             }}>
-            <Image
-              source={require('../images/search.jpg')}
-              style={styles.search}
-            />
-            <Text style={styles.placeholder}>
-              Please search here......
-            </Text>
+            <Icon name="search" size={25} color="#000" style={styles.search} />
+
+            <Text style={styles.placeholder}>Please search here......</Text>
           </TouchableOpacity>
+
           <Text style={styles.note}>
             Search 1000+ recipes easily with one click
           </Text>
@@ -103,12 +100,12 @@ const HomeScreen = () => {
           horizontal
           data={MEAL_FILTERS}
           showsHorizontalScrollIndicator={false}
-          renderItem={({ item }) => (
+          renderItem={({item}) => (
             <AnimatedBtn
               animation={'slideInUp'}
               style={styles.categoryItem}
               onPress={() => {
-                navigation.navigate('RecipeByCategory', { category: item.title });
+                navigation.navigate('RecipeByCategory', {category: item.title});
               }}>
               <View style={styles.card}>
                 <Image source={item.icon} style={styles.categoryIcon} />
@@ -116,7 +113,7 @@ const HomeScreen = () => {
               <Text style={styles.category}>{item.title}</Text>
             </AnimatedBtn>
           )}
-          keyExtractor={(item) => item.title} 
+          keyExtractor={item => item.title}
         />
       </View>
 
@@ -125,34 +122,37 @@ const HomeScreen = () => {
       </Animatable.Text>
 
       {isLoading ? (
-        <ActivityIndicator size="large" color="#509750" style={{ marginTop: 20 }} />
+        <ActivityIndicator
+          size="large"
+          color="#509750"
+          style={{marginTop: 20}}
+        />
       ) : (
         <FlatList
-  contentContainerStyle={{ marginTop: 10 }}
-  horizontal
-  data={recipes}
-  renderItem={({ item }) => (
-    <AnimatedBtn
-      animation={'slideInUp'}
-      style={styles.recipeItem}
-      onPress={() => {
-        navigation.navigate('Details', {
-          data: item,
-        });
-      }}>
-      <Animatable.Image
-        animation={'slideInUp'}
-        source={{ uri: item.recipe.image }}
-        style={styles.recipeImage}
-      />
-      <View style={styles.transparentView}>
-        <Text style={styles.recipeLabel}>{item.recipe.label}</Text>
-      </View>
-    </AnimatedBtn>
-  )}
-  keyExtractor={(item, index) => `${item.recipe.label}-${index}`} 
-/>
-
+          contentContainerStyle={{marginTop: 10}}
+          horizontal
+          data={recipes}
+          renderItem={({item}) => (
+            <AnimatedBtn
+              animation={'slideInUp'}
+              style={styles.recipeItem}
+              onPress={() => {
+                navigation.navigate('Details', {
+                  data: item,
+                });
+              }}>
+              <Animatable.Image
+                animation={'slideInUp'}
+                source={{uri: item.recipe.image}}
+                style={styles.recipeImage}
+              />
+              <View style={styles.transparentView}>
+                <Text style={styles.recipeLabel}>{item.recipe.label}</Text>
+              </View>
+            </AnimatedBtn>
+          )}
+          keyExtractor={(item, index) => `${item.recipe.label}-${index}`}
+        />
       )}
     </View>
   );
@@ -210,7 +210,7 @@ const styles = StyleSheet.create({
   },
   search: {
     width: 40,
-    height: 40,
+    height: 30,
   },
   placeholder: {
     marginLeft: 15,

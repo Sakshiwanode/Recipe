@@ -66,7 +66,7 @@ const Search = ({ navigation }: any) => {
   return (
     <View style={styles.container}>
       <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-        <Icon name="arrow-back" size={30} color="#fff" />
+        <Icon name="arrow-back" size={30} color="#509750" />
       </TouchableOpacity>
 
       <View style={styles.searchBox}>
@@ -236,7 +236,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',
-    backgroundColor: '#509750',
+    backgroundColor: '#eaecec',
   },
   backButton: {
     position: 'absolute',
