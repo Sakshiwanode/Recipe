@@ -26,7 +26,7 @@ interface User {
   };
 }
 
-const AnimatedBtn = Animatable.createAnimatableComponent(TouchableOpacity);
+
 
 const Profile = ({ navigation }: any) => {
   const [userData, setUserData] = useState<User | null>(null);
@@ -35,7 +35,7 @@ const Profile = ({ navigation }: any) => {
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
 
-  // Fetch user data (GET request)
+  
   const fetchUserData = async () => {
     setLoading(true);
     try {

@@ -4,6 +4,7 @@ import * as Animatable from 'react-native-animatable';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Splash = ({ navigation }: any) => {
+  const [loading, setLoading] = useState(true); 
   const [isFirstLaunch, setIsFirstLaunch] = useState<boolean | null>(null);
 
   useEffect(() => {
@@ -11,15 +12,15 @@ const Splash = ({ navigation }: any) => {
       try {
         const launchedBefore = await AsyncStorage.getItem('launchedBefore');
         if (launchedBefore === null) {
-          
           setIsFirstLaunch(true);
           await AsyncStorage.setItem('launchedBefore', 'true');
         } else {
-         
           setIsFirstLaunch(false);
         }
       } catch (error) {
         console.log('Error checking first launch:', error);
+      } finally {
+        setLoading(false); 
       }
     };
 
@@ -27,20 +28,27 @@ const Splash = ({ navigation }: any) => {
   }, []);
 
   useEffect(() => {
-    if (isFirstLaunch === false) {
-      // Skip splash and navigate immediately if not first launch
-      navigation.navigate('Drawer');
-    } else if (isFirstLaunch === true) {
-      // Wait for 3 seconds before navigating to the main screen
-      setTimeout(() => {
+    if (!loading) {
+      if (isFirstLaunch === false) {
+        // Skip splash and navigate immediately if not first launch
         navigation.navigate('Drawer');
-      }, 3000);
+      } else if (isFirstLaunch === true) {
+       
+        const timer = setTimeout(() => {
+          navigation.navigate('Drawer');
+        }, 3000);
+        return () => clearTimeout(timer);
+      }
     }
-  }, [isFirstLaunch, navigation]);
+  }, [loading, isFirstLaunch, navigation]);
 
-  if (isFirstLaunch === null) {
-    // Optionally render a loading screen while checking
-    return null;
+  // Render loading screen until 
+  if (loading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <Text style={styles.loadingText}>Loading...</Text>
+      </View>
+    );
   }
 
   return (
@@ -60,6 +68,7 @@ const Splash = ({ navigation }: any) => {
   );
 };
 
+
 export default Splash;
 
 const styles = StyleSheet.create({
@@ -68,6 +77,17 @@ const styles = StyleSheet.create({
     backgroundColor: '#509750',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  loadingContainer: {
+    flex: 1,
+    backgroundColor: '#509750',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  loadingText: {
+    fontSize: 24,
+    fontWeight: '600',
+    color: 'white', 
   },
   logo: {
     width: 200,

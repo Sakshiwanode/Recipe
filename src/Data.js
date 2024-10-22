@@ -46,17 +46,17 @@ export const HEALTH_FILTERS = [
 ];
 
 export const MEAL_FILTERS = [
-  {title: 'breakfast', icon: require('./images/logo.png')},
+  {title: 'breakfast', icon: require('./images/breakfast.png')},
 
-  {title: 'brunch', icon: require('./images/logo.png')},
+  {title: 'brunch', icon: require('./images/brunch.png')},
 
-  {title: 'lunch', icon: require('./images/logo.png')},
+  {title: 'lunch', icon: require('./images/lunch.png')},
 
-  {title: 'dinner', icon: require('./images/logo.png')},
+  {title: 'dinner', icon: require('./images/dinner.png')},
 
-  {title: 'snack', icon: require('./images/logo.png')},
+  {title: 'snack', icon: require('./images/snack.png')},
 
-  {title: 'teatime', icon: require('./images/logo.png')},
+  {title: 'teatime', icon: require('./images/tea.png')},
 ];
 
 export const DISH_FILTERS = [
