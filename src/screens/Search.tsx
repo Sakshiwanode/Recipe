@@ -1,39 +1,68 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, TextInput, FlatList, ActivityIndicator, Dimensions, Image } from 'react-native';
+import { Text, View, TouchableOpacity, TextInput, FlatList, ActivityIndicator, Image, StyleSheet } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import Modal from 'react-native-modal';
 import { DISH_FILTERS, DIET_FILTERS, HEALTH_FILTERS, CUISINE_FILTERS } from '../Data';
-
-const screenHeight = Dimensions.get('window').height;
 
 const Search = ({ navigation }: any) => {
   const [search, setSearch] = useState('');
   const [recipes, setRecipes] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
-  const [selectedFilters, setSelectedFilters] = useState<string[]>([]);
-  
+
   const [selectDish, setSelectDish] = useState('');
   const [selectCuisine, setSelectCuisine] = useState('');
   const [selectHealth, setSelectHealth] = useState('');
   const [selectDiet, setSelectDiet] = useState('');
-
   const searchRecipe = async () => {
     if (!search.trim()) return;
     setLoading(true);
+  
+    const myHeaders = new Headers();
+    myHeaders.append('accept', 'application/json');
+    myHeaders.append('Accept-Language', 'en');
+  
+    const requestOptions = {
+      method: 'GET',
+      headers: myHeaders,
+      redirect: 'follow',
+    };
+  
+    let url = '';
+    if (selectDish=='' && selectCuisine=='' && selectHealth=='' && selectDiet=='') {
+      url = `https://api.edamam.com/api/recipes/v2?type=public&q=${search}&app_id=55517a84&app_key=06ccbd6df34b3d255b5cb2c5cf427d7d`;
+    } else if (selectCuisine) {
+      url = `https://api.edamam.com/api/recipes/v2?type=public&q=${search}&app_id=55517a84&app_key=06ccbd6df34b3d255b5cb2c5cf427d7d&cuisineType=${selectCuisine}`;
+    } else if (selectHealth) {
+      url = `https://api.edamam.com/api/recipes/v2?type=public&q=${search}&app_id=55517a84&app_key=06ccbd6df34b3d255b5cb2c5cf427d7d&health=${selectHealth}`;
+    } else if (selectDiet) {
+      url = `https://api.edamam.com/api/recipes/v2?type=public&q=${search}&app_id=55517a84&app_key=06ccbd6df34b3d255b5cb2c5cf427d7d&diet=${selectDiet}`;
+    } else if (selectCuisine!='' && selectHealth!='' && selectDiet!='') {
+      url = `https://api.edamam.com/api/recipes/v2?type=public&q=${search}&app_id=55517a84&app_key=06ccbd6df34b3d255b5cb2c5cf427d7d&health=${selectHealth}&diet=${selectDiet}&cuisineType=${selectCuisine}`;
+    }
+  
     try {
-      const response = await fetch(
-        `https://api.edamam.com/api/recipes/v2?type=public&q=${search}&app_id=55517a84&app_key=06ccbd6df34b3d255b5cb2c5cf427d7d&dishType=${selectDish}&cuisineType=${selectCuisine}&health=${selectHealth}&diet=${selectDiet}`
-      );
+      const response = await fetch(url, );
       const result = await response.json();
-      setRecipes(result.hits || []); 
+      console.log(result.hits);
+      setRecipes(result.hits);
     } catch (error) {
-      console.error(error);
+      console.error('Error fetching recipes:', error);
     } finally {
       setLoading(false);
     }
   };
+  const clearFilters = () => {
+    setSelectDish('');
+    setSelectCuisine('');
+    setSelectHealth('');
+    setSelectDiet('');
+  };
+  
 
+
+
+  
   return (
     <View style={styles.container}>
       <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
@@ -174,6 +203,16 @@ const Search = ({ navigation }: any) => {
               )}
             />
           </View>
+
+           {/* Clear Filters Button */}
+    <TouchableOpacity
+      style={styles.clearThisButton}
+      onPress={() => {
+        clearFilters(); // Clear the filters
+      }}
+    >
+      <Text style={styles.clearButtonText}>Clear Filters</Text>
+    </TouchableOpacity>
 
           <TouchableOpacity
             style={styles.applyButton}
@@ -348,5 +387,21 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     width: '100%', 
-    marginBottom: 10,}
+    marginBottom: 10,
+  },
+  clearThisButton: {
+      marginTop: 10,
+      backgroundColor: '#ff4d4d', 
+      paddingVertical: 10,
+      borderRadius: 8,
+    },
+    
+    clearButtonText: {
+      textAlign: 'center',
+      color: '#fff',
+      fontSize: 16,
+    },
+    
 });
+
+

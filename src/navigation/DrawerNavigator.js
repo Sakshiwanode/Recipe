@@ -58,7 +58,7 @@ const DrawerNavigator = () => {
         }}
       >
         <Drawer.Screen
-          name="Home"
+          name="HomeScreen"
           component={MainTabNavigator}
           options={{
             headerShown: false,

@@ -11,11 +11,11 @@ const Splash = ({ navigation }: any) => {
       try {
         const launchedBefore = await AsyncStorage.getItem('launchedBefore');
         if (launchedBefore === null) {
-          // First launch, show splash screen
+          
           setIsFirstLaunch(true);
           await AsyncStorage.setItem('launchedBefore', 'true');
         } else {
-          // Already launched, skip splash 
+         
           setIsFirstLaunch(false);
         }
       } catch (error) {
