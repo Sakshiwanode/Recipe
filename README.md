@@ -25,7 +25,7 @@ This app allows users to **search recipes with filters**, enjoy a nice **splash 
 
 ## 📥 APK Download
 
-👉 [Download Latest APK](./apk/RecipeApp.apk)  
+👉 [Download RecipeApp.apk](./apk/RecipeApp.apk)  
 
 *(Place your built APK inside an `apk/` folder in the repo.)*
 
