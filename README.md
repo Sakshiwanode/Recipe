@@ -1,4 +1,50 @@
 This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+# 🍲 Recipe App
+
+A beautifully designed **React Native Recipe App** with modern UI, animations, and smooth navigation.  
+This app allows users to **search recipes with filters**, enjoy a nice **splash screen, animation**, with  ** login and profile**.  
+
+---
+
+## ✨ Features
+
+- 🔍 **Search & Filter Recipes** – Easily find your favorite dishes.  
+- 🎬 **Animations** – Smooth transitions and engaging UI.  
+- 🚀 **Splash Screen** – Modern animated splash intro.  
+- 👤 **Profile Section** – View and update user details.  
+
+
+---
+
+## 📸 Screenshots
+
+_Add app screenshots here (replace the below with your actual images):_
+
+## 📸 Screenshots
+
+| Splash Screen | Login Screen | Home Screen |
+|---------------|--------------|--------------|
+| ![Splash](./Media%20(1).png) | ![Login](./Media%20(2).png) | ![Home](./Media%20(3).png) |
+
+
+---
+
+## 📥 APK Download
+
+👉 [Download Latest APK](./apk/RecipeApp.apk)  
+
+*(Place your built APK inside an `apk/` folder in the repo.)*
+
+---
+
+## 🛠️ Installation & Setup
+
+Clone the repo and install dependencies:
+
+```bash
+git clone https://github.com/your-username/recipe-app.git
+cd recipe-app
+npm install
 
 # Getting Started
 
@@ -18,7 +64,7 @@ npm start
 yarn start
 ```
 
-## Step 2: Start your Application
+## Step 1: Start your Application
 
 Let Metro Bundler run in its _own_ terminal. Open a _new_ terminal from the _root_ of your React Native project. Run the following command to start your _Android_ or _iOS_ app:
 
