@@ -18,7 +18,7 @@ This app allows users to **search recipes with filters**, enjoy a nice **splash 
 
 ## 📸 Screenshots
 
-|![Image](https://github.com/user-attachments/assets/109e32b9-e52c-464e-bd80-f1dd22f54691)) 
+![Image](https://github.com/user-attachments/assets/109e32b9-e52c-464e-bd80-f1dd22f54691)
 
 
 ---
