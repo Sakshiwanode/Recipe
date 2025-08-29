@@ -24,7 +24,7 @@ _Add app screenshots here (replace the below with your actual images):_
 
 | Splash Screen | Login Screen | Home Screen |
 |---------------|--------------|--------------|
-| ![Splash](./Media%20(1).png) | ![Login](./Media%20(2).png) | ![Home](./Media%20(3).png) |
+| ![Splash](./Media%20%281%29.png) |  ![Login](./Media%20(2).png) | ![Home](./Media%20(3).png) |
 
 
 ---
